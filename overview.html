@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.5.0/dist/tabler-icons.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root{
@@ -68,11 +67,18 @@ input,select{border:.5px solid var(--color-border-tertiary);border-radius:var(--
 .tbl tbody tr:last-child td{border-bottom:none}
 .tbl tr.tot td{background:var(--color-background-secondary);font-weight:500;border-top:1px solid var(--color-border-secondary)}
 .exp-row{cursor:pointer}
-.exp-row:hover td{filter:brightness(.97)}
+.exp-row:hover>td{filter:brightness(.97)}
 .det{display:none}
 .det.open{display:table-row}
-.chev{cursor:pointer;color:var(--color-text-tertiary);display:inline-flex;align-items:center;vertical-align:middle;margin-left:5px;line-height:1}
-.chev:hover{color:var(--color-text-info)}
+.det-emp{display:none}
+.det-emp.open{display:table-row}
+.det-emp>td{font-size:11.5px;padding-top:6px;padding-bottom:6px}
+.det-emp>td:first-child{padding-left:26px;border-left:2px solid var(--color-border-info)}
+.det-emp .ema{color:var(--color-text-secondary);font-weight:400;font-size:11px;margin-left:3px}
+.chev{color:var(--color-text-tertiary);display:inline-flex;align-items:center;vertical-align:middle;margin-left:6px}
+.exp-row:hover .chev{color:var(--color-text-info)}
+.cv{transition:transform .15s ease;display:block}
+.cv.open{transform:rotate(180deg)}
 .pos{color:var(--color-text-info)}
 .bdg{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;font-weight:500;background:var(--color-background-info);color:var(--color-text-info)}
 .bdg.g{background:var(--color-background-secondary);color:var(--color-text-secondary)}
@@ -85,7 +91,7 @@ input,select{border:.5px solid var(--color-border-tertiary);border-radius:var(--
 .note{font-size:11px;color:var(--color-text-secondary);margin-top:8px}
 .det-wrap{background:var(--color-background-secondary);padding:9px 12px}
 .empty{padding:14px;text-align:center;color:var(--color-text-secondary);font-size:12px}
-.heat-legend{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:10px;color:var(--color-text-secondary)}
+.heat-legend{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:10px;color:var(--color-text-secondary);flex-wrap:wrap}
 .heat-legend i{display:block;width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(24,95,165,.05),rgba(24,95,165,.47))}
 </style>
 </head>
@@ -153,6 +159,7 @@ const fM=n=>(Math.round(n/100000)/10).toFixed(1)+'M';
 const fB=n=>(n/1e9).toFixed(2)+' tỷ';
 const fMoney=n=>Math.abs(n)>=1e9?fB(n):fM(n);
 const P=(a,b)=>b?(a/b*100).toFixed(0)+'%':'—';
+const CV='<span class="chev"><svg class="cv" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>';
 function mm(a){let mn=Infinity,mx=-Infinity;a.forEach(v=>{if(v<mn)mn=v;if(v>mx)mx=v;});return{mn,mx};}
 function heat(v,o){if(!o||!isFinite(o.mn)||o.mx===o.mn)return '';const t=(v-o.mn)/(o.mx-o.mn);return 'background:rgba(24,95,165,'+(0.05+0.42*t).toFixed(3)+')';}
 function progTax(t){if(t<=0)return 0;const b=[[5e6,.05],[5e6,.1],[8e6,.15],[14e6,.2],[20e6,.25],[28e6,.3],[Infinity,.35]];let x=0,r=t;for(const[l,rt]of b){if(r<=0)break;const tx=Math.min(r,l);x+=tx*rt;r-=tx;}return Math.round(x);}
@@ -187,7 +194,8 @@ const MO=[{m:'T07',ym:'2025-07',f:0.948},{m:'T08',ym:'2025-08',f:0.964},{m:'T09'
 const companyBaseGross=EMP.reduce((s,e)=>s+e.gross,0);
 
 let CH={},MODE='money',VIEW=null;
-window.toggleRow=function(id,el){const b=document.getElementById(id);if(!b)return;b.classList.toggle('open');if(el)el.innerHTML='<i class="ti '+(b.classList.contains('open')?'ti-chevron-up':'ti-chevron-down')+'" style="font-size:14px"></i>';};
+window.toggleRow=function(id,row){const b=document.getElementById(id);if(!b)return;const open=b.classList.toggle('open');const cv=row.querySelector('.cv');if(cv)cv.classList.toggle('open',open);};
+window.toggleDep=function(i,row){const rows=document.querySelectorAll('.e'+i);const open=!(rows[0]&&rows[0].classList.contains('open'));rows.forEach(r=>r.classList.toggle('open',open));const cv=row.querySelector('.cv');if(cv)cv.classList.toggle('open',open);};
 window.setMode=function(m){MODE=m;document.getElementById('segMoney').classList.toggle('on',m==='money');document.getElementById('segPct').classList.toggle('on',m==='pct');if(VIEW)renderDetail();};
 
 document.getElementById('fKhoi').innerHTML='<option value="ALL" selected>Toàn khối</option>'+DEPMETA.map(d=>'<option value="'+d.ma+'">'+d.ten+'</option>').join('');
@@ -205,8 +213,9 @@ function renderDetail(){
  const rng={};cols.forEach(k=>{rng[k]=mm(deps.map(d=>val(d,k)));});
  const body=deps.map((d,i)=>{
   const emps=d.emps,erng={};cols.forEach(k=>{erng[k]=mm(emps.map(e=>val(e,k)));});
-  const inner='<table class="itbl"><thead><tr><th>Nhân viên</th><th>Vai trò</th><th>Lương cứng</th><th>Hoa hồng</th><th>Thưởng</th><th>Phụ cấp</th><th>Tổng quỹ</th><th>'+lastH+'</th></tr></thead><tbody>'+emps.map(e=>'<tr><td>'+e.name+' <span style="color:var(--color-text-secondary);font-weight:400">'+e.ma+'</span></td><td><span class="bdg '+(e.role==='CTV'?'g':'')+'">'+e.role+'</span></td>'+td(e,'lc',erng.lc)+td(e,'hh',erng.hh)+td(e,'thuong',erng.thuong)+td(e,'pc',erng.pc)+td(e,'gross',erng.gross,'pos')+td(e,'net',erng.net)+'</tr>').join('')+'</tbody></table>';
-  return '<tr class="exp-row" onclick="toggleRow(\''+'dp'+i+'\',this.querySelector(\'.chev\'))"><td>'+d.ten+' <span class="bdg" style="margin-left:4px">'+d.ma+'</span><span class="chev"><i class="ti ti-chevron-down" style="font-size:14px"></i></span></td><td>'+d.hc+'</td>'+td(d,'lc',rng.lc)+td(d,'hh',rng.hh)+td(d,'thuong',rng.thuong)+td(d,'pc',rng.pc)+td(d,'gross',rng.gross,'pos')+td(d,'net',rng.net)+'</tr><tr class="det" id="dp'+i+'"><td colspan="8"><div class="det-wrap">'+inner+'</div></td></tr>';
+  const depRow='<tr class="exp-row" onclick="toggleDep('+i+',this)"><td>'+d.ten+' <span class="bdg" style="margin-left:4px">'+d.ma+'</span>'+CV+'</td><td>'+d.hc+'</td>'+td(d,'lc',rng.lc)+td(d,'hh',rng.hh)+td(d,'thuong',rng.thuong)+td(d,'pc',rng.pc)+td(d,'gross',rng.gross,'pos')+td(d,'net',rng.net)+'</tr>';
+  const empRows=emps.map(e=>'<tr class="det-emp e'+i+'"><td>'+e.name+'<span class="ema">'+e.ma+'</span></td><td><span class="bdg '+(e.role==='CTV'?'g':'')+'" style="font-weight:400">'+e.role+'</span></td>'+td(e,'lc',erng.lc)+td(e,'hh',erng.hh)+td(e,'thuong',erng.thuong)+td(e,'pc',erng.pc)+td(e,'gross',erng.gross,'pos')+td(e,'net',erng.net)+'</tr>').join('');
+  return depRow+empRows;
  }).join('');
  const totLast=MODE==='pct'?P(G.net,G.gross):fB(G.net);
  const totTong=MODE==='pct'?'100%':fB(G.gross);
@@ -253,11 +262,13 @@ function render(){
 
  const proj=baseProj.map(p=>({...p,hh:p.hh*mult,emps:p.emps.map(x=>[x[0],x[1],x[2]*mult])}));
  const projHH=proj.reduce((a,p)=>a+p.hh,0);
+ const totDS=proj.reduce((a,p)=>a+p.ds,0);
+ const totNV=proj.reduce((a,p)=>a+p.emps.length,0);
  document.getElementById('tProj').innerHTML=
   '<thead><tr><th>Dự án</th><th>DS ghi nhận</th><th>HH kỳ này</th><th>Số NV</th><th>% HH</th></tr></thead><tbody>'+
-  proj.map((p,i)=>'<tr class="exp-row" onclick="toggleRow(\''+'pj'+i+'\',this.querySelector(\'.chev\'))"><td>'+p.da+'<span class="chev"><i class="ti ti-chevron-down" style="font-size:14px"></i></span></td><td>'+fMoney(p.ds)+'</td><td class="pos" style="font-weight:500">'+fM(p.hh)+'</td><td>'+p.emps.length+'</td><td>'+(projHH?(p.hh/projHH*100).toFixed(0):0)+'%</td></tr><tr class="det" id="pj'+i+'"><td colspan="5"><div class="det-wrap"><table class="itbl"><thead><tr><th>Nhân viên</th><th>Vai trò</th><th>HH nhận từ dự án</th></tr></thead><tbody>'+p.emps.map(x=>'<tr><td>'+x[0]+'</td><td><span class="bdg '+(x[1]==='CTV'?'g':'')+'">'+x[1]+'</span></td><td class="pos" style="font-weight:500">'+fM(x[2])+'</td></tr>').join('')+'</tbody></table></div></td></tr>').join('')+
-  '<tr class="tot"><td>Tổng ('+proj.length+' DA)</td><td>—</td><td class="pos">'+fM(projHH)+'</td><td>—</td><td>100%</td></tr></tbody>';
- document.getElementById('projNote').textContent=khoi==='ALL'?'Hoa hồng dự án theo kỳ đã chọn.':'Lương dự án là số liệu toàn công ty, không tách theo khối.';
+  proj.map((p,i)=>'<tr class="exp-row" onclick="toggleRow(\''+'pj'+i+'\',this)"><td>'+p.da+CV+'</td><td>'+fMoney(p.ds)+'</td><td class="pos" style="font-weight:500">'+fM(p.hh)+'</td><td>'+p.emps.length+'</td><td>'+(projHH?(p.hh/projHH*100).toFixed(0):0)+'%</td></tr><tr class="det" id="pj'+i+'"><td colspan="5"><div class="det-wrap"><table class="itbl"><thead><tr><th>Nhân viên</th><th>Vai trò</th><th>HH nhận từ dự án</th><th>%HH</th></tr></thead><tbody>'+p.emps.map(x=>'<tr><td>'+x[0]+'</td><td><span class="bdg '+(x[1]==='CTV'?'g':'')+'">'+x[1]+'</span></td><td class="pos" style="font-weight:500">'+fM(x[2])+'</td><td>'+(p.hh?(x[2]/p.hh*100).toFixed(0):0)+'%</td></tr>').join('')+'</tbody></table></div></td></tr>').join('')+
+  '<tr class="tot"><td>Tổng ('+proj.length+' DA)</td><td>'+fMoney(totDS)+'</td><td class="pos">'+fM(projHH)+'</td><td>'+totNV+'</td><td>100%</td></tr></tbody>';
+ document.getElementById('projNote').textContent=khoi==='ALL'?'Hoa hồng dự án theo kỳ đã chọn. Cột %HH = phần hoa hồng của nhân viên trên tổng HH của dự án đó.':'Lương dự án là số liệu toàn công ty, không tách theo khối.';
 
  Object.values(CH).forEach(c=>{try{c.destroy()}catch(_){}});CH={};
  CH.cmp=new Chart(document.getElementById('cCmp'),{type:'doughnut',data:{labels:comp.map(x=>x.l),datasets:[{data:comp.map(x=>+(x.v/1e6).toFixed(1)),backgroundColor:comp.map(x=>x.c),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'M ('+(G.gross?(c.parsed/(G.gross/1e6)*100).toFixed(0):0)+'%)'}}},cutout:'62%'}});
