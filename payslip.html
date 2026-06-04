@@ -35,8 +35,12 @@ input,select{border:.5px solid var(--color-border-tertiary);border-radius:var(--
 .sb input{flex:1 1 auto;min-width:0;height:36px;font-size:14px;padding:0 12px}
 .sb select{flex:0 0 100px;width:100px;height:36px;font-size:13px;padding:0 8px}
 .sb button{flex:0 0 auto;height:36px;padding:0 16px;font-size:13px;white-space:nowrap}
+.sb-dates{display:flex;align-items:center;gap:5px;flex:0 0 auto;background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:0 9px;height:36px}
+.sb-dates label{font-size:10px;color:var(--color-text-secondary);font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.sb-dates input[type=date]{border:none;height:34px;font-size:12px;background:transparent;color:var(--color-text-primary);width:116px;padding:0 2px}
+@media print{@page{margin:12mm}html,body{background:#fff!important}.wrap{max-width:none!important;padding:0!important}body *{visibility:hidden!important}#paySlipPrint,#paySlipPrint *{visibility:visible!important}#paySlipPrint{position:absolute;left:0;top:0;width:100%;margin:0!important;border:none!important;box-shadow:none!important;padding:0!important}.noprint{display:none!important}}
 .nf{padding:14px;text-align:center;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md)}
-.ph{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;margin-bottom:10px}
+.ph{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(16,40,80,.06),0 1px 2px rgba(16,40,80,.04)}
 .ph-row1{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .av{width:40px;height:40px;border-radius:50%;background:var(--color-background-info);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--color-text-info);flex-shrink:0}
 .ph-name{font-size:14px;font-weight:500}
@@ -58,7 +62,7 @@ input,select{border:.5px solid var(--color-border-tertiary);border-radius:var(--
 .dg{background:#185FA5}.dr{background:#E24B4A}
 .krow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 @media(max-width:600px){.krow{grid-template-columns:1fr}}
-.kc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+.kc{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);box-shadow:0 1px 3px rgba(16,40,80,.06),0 1px 2px rgba(16,40,80,.04);border-radius:var(--border-radius-md);padding:10px 12px}
 .kl{font-size:10px;color:var(--color-text-secondary);font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em}
 .kv{font-size:17px;font-weight:500}
 .ks{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
@@ -71,7 +75,7 @@ input,select{border:.5px solid var(--color-border-tertiary);border-radius:var(--
 .tab{flex-shrink:0;padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-1.5px;white-space:nowrap}
 .tab.on{color:var(--color-text-info);border-bottom-color:var(--color-text-info)}
 .pnl{display:none}.pnl.on{display:block}
-.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:11px 13px;margin-bottom:10px}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:11px 13px;margin-bottom:10px;box-shadow:0 1px 3px rgba(16,40,80,.06),0 1px 2px rgba(16,40,80,.04)}
 .shd{font-size:10px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
 .iitem{border-bottom:.5px solid var(--color-border-tertiary)}
 .iitem:last-child{border-bottom:none}
@@ -187,7 +191,7 @@ input,select{border:.5px solid var(--color-border-tertiary);border-radius:var(--
 <div class="app">
 <div class="sb">
   <input id="nv" type="text" placeholder="Nhập mã nhân viên — VD: NV0578, NV0613, CTV001..." value="NV0578"/>
-  <select id="mon"><option value="T01/2026" selected>T01/2026</option><option value="T12/2025">T12/2025</option></select>
+  <div class="sb-dates"><label>Từ</label><input type="date" id="dStart" value="2026-01-01"><label>Đến</label><input type="date" id="dEnd" value="2026-01-31"></div>
   <button onclick="window.go()"><svg class="ic" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>Tra cứu</button>
 </div>
 <div id="content" style="display:none">
@@ -246,8 +250,8 @@ function calc(d){
   const gross=lb+hhN+kq+(d.thuongDA||0)+(d.thuongTet||0)+(d.luongT13||0)+(d.ot||0)+(d.xe||0)+(d.an||0)+(d.khac||0)-(d.phat||0);
   const bh=Math.round(d.bhxhBase*.105);
   const gtgcA=d.gtgc?(11000000+d.pt*4400000):0;
-  const tinhthu=Math.max(0,Math.max(0,gross-(d.an||0))-bh-gtgcA);
-  const t=d.role==='CTV'?Math.round(hhN*.1):tax(tinhthu);
+  const tinhthu=Math.max(0,gross-bh-gtgcA);
+  const t=tax(tinhthu);
   return{lb,hhN,kq,gross,bh,gtgcA,chuthu:Math.max(0,gross-(d.an||0)),tinhthu,tax:t,net:gross-(bh+t)};
 }
 function diffStr(now,prev){if(!prev)return'';const d=Math.round(now-prev),p=Math.round((now-prev)/prev*100);return`<span class="${d>=0?'up':'dn'}">${d>=0?'+':''}${fM(d)} (${p>=0?'+':''}${p}%)</span>`}
@@ -329,7 +333,7 @@ cmpNet:8200000,
 trend:[{m:'T07',net:5,lb:4.5,hh:0,th:0.5,ds:0},{m:'T08',net:6.5,lb:4.5,hh:1,th:1,ds:52},{m:'T09',net:7,lb:4.5,hh:1.5,th:1,ds:60},{m:'T10',net:8.2,lb:4.5,hh:2.5,th:1.2,ds:75},{m:'T11',net:7.8,lb:4.5,hh:2,th:1.3,ds:68},{m:'T12',net:8.2,lb:4.5,hh:3,th:0.7,ds:52},{m:'T01',net:0,lb:0,hh:0,th:0,ds:73.8}],
 daDist:[{da:'Masteri Era',pct:62,ds:73.8},{da:'Hà Đô',pct:38,ds:55}]
 },
-'CTV001':{name:'Nguyễn Thu Hà',init:'NH',role:'CTV',khoi:'A3',phong:'PKD A3',hd:'CTV',mst:'N/A',bank:'TECHCOMBANK',stk:'19032044298686',ngayBD:'01/06/2025',bhxhBase:0,gtgc:0,pt:0,bhxhSt:'Không đóng',tncn:'10% tại nguồn',luong:0,ngayCong:0,chuanT:0,phepHuong:0,phepNamNay:0,phepCon:0,phepConT02:0,ngayLe:0,ngayKL:0,kpiDs:50000000,dsTeam:35000000,dsCK:28000000,hhMuc:'—',hhTiers:[],teamMembers:null,
+'CTV001':{name:'Nguyễn Thu Hà',init:'NH',role:'CTV',khoi:'A3',phong:'PKD A3',hd:'CTV',mst:'N/A',bank:'TECHCOMBANK',stk:'19032044298686',ngayBD:'01/06/2025',bhxhBase:0,gtgc:1,pt:0,bhxhSt:'Không đóng',tncn:'Lũy tiến (đang khai)',luong:0,ngayCong:0,chuanT:0,phepHuong:0,phepNamNay:0,phepCon:0,phepConT02:0,ngayLe:0,ngayKL:0,kpiDs:50000000,dsTeam:35000000,dsCK:28000000,hhMuc:'—',hhTiers:[],teamMembers:null,
 hhDa:[
   {da:'Masteri Era Landmark',can:'C3Z2-24-02',ds:35000000,hhR:0.10,hhTong:3500000,ngayGhiNhan:'28/01/2026',dots:[{n:'Đợt 1 — TT 100%',p:100,d:'28/01/2026',hh:3500000,cur:true}]},
   {da:'Sunshine City Sài Gòn',can:'SS-T2-0318',ds:48000000,hhR:0.08,hhTong:3840000,ngayGhiNhan:'22/12/2025',dots:[{n:'Đợt 1 — Ký HĐ (50%)',p:50,d:'22/12/2025',hh:1920000,done:true,paid:'22/12/2025'},{n:'Đợt 2 — Bàn giao (50%)',p:50,d:'01/08/2026',hh:1920000}]},
@@ -360,12 +364,16 @@ daDist:[]
 }
 };
 
-let CUR=null,selDA=new Set();
+let CUR=null,selDA=new Set(),PERIOD='';
 
 window.go=function(){
   kc();
   const id=document.getElementById('nv').value.trim().toUpperCase();
-  const mon=document.getElementById('mon').value;
+  const dS=document.getElementById('dStart').value||'2026-01-01';
+  const dE=document.getElementById('dEnd').value||'2026-01-31';
+  const sD=dS<dE?dS:dE,eD=dS<dE?dE:dS;
+  const mon=eD.slice(0,7)==='2025-12'?'T12/2025':'T01/2026';
+  PERIOD=sD.split('-').reverse().join('/')+' – '+eD.split('-').reverse().join('/');
   const d=DB[id];
   document.getElementById('content').style.display=d?'block':'none';
   document.getElementById('nf').style.display=d?'none':'block';
@@ -500,12 +508,10 @@ function rPhieu(d,c,mon,cid){
     d.khac>0?irow('ti-plus','var(--color-background-secondary)','var(--color-text-secondary)','Phụ cấp khác','Theo quyết định',d.khac,true,'Phụ cấp khác',[{l:'Mức trả',v:f(d.khac)},{l:'Ghi chú',v:'Điện thoại/chức danh'}]):null,
     d.phat>0?irow('ti-ban','var(--color-background-danger)','var(--color-text-danger)','Khấu trừ vi phạm','Biên bản kỷ luật tháng',-d.phat,false,'Khấu trừ vi phạm',[{l:'Mức trừ',v:f(d.phat),sign:'neg'}]):null,
   ].filter(Boolean);
-  const taxRows=d.role==='CTV'
-    ?[{l:'HH kỳ này',v:f(c.hhN)},{l:'Thuế suất CTV',v:'10% tại nguồn'},{l:'Thuế TNCN',v:f(c.tax),total:true,sign:'neg'}]
-    :[{l:'Tổng thu nhập (Gross)',v:f(c.gross)},{l:'− Ăn trưa miễn thuế',v:f(d.an||0)},{l:'TN chịu thuế',v:f(c.chuthu)},{l:'− BHXH',v:f(c.bh)},{l:`− GTGC bản thân + ${d.pt} PT`,v:f(c.gtgcA)},{l:'TN tính thuế',v:f(c.tinhthu)},{l:'Thuế TNCN',v:f(c.tax),total:true,sign:'neg'}];
+  const taxRows=[{l:'Tổng thu nhập (tổng lương)',v:f(c.gross)},{l:'− BHXH (10,5%)',v:f(c.bh)},{l:`− Giảm trừ gia cảnh${d.pt?` (bản thân + ${d.pt} NPT)`:' (bản thân)'}`,v:f(c.gtgcA)},{l:'Thu nhập tính thuế',v:f(c.tinhthu)},{l:'Thuế TNCN (biểu lũy tiến)',v:f(c.tax),total:true,sign:'neg'}];
   const ded=[
     irow('ti-shield-check','var(--color-background-secondary)','var(--color-text-secondary)','BHXH + BHYT + BHTN (10.5%)',`Lương đóng BH ${f(d.bhxhBase)} × 10.5%`,-c.bh,false,'Chi tiết BHXH 10,5%',[{l:'BHXH 8%',v:f(Math.round(d.bhxhBase*.08))},{l:'BHYT 1,5%',v:f(Math.round(d.bhxhBase*.015))},{l:'BHTN 1%',v:f(Math.round(d.bhxhBase*.01))},{l:'Tổng khấu trừ BH',v:f(c.bh),total:true,sign:'neg'}]),
-    irow('ti-receipt-tax','var(--color-background-danger)','var(--color-text-danger)','Thuế TNCN',d.role==='CTV'?'CTV: 10% tại nguồn trên HH':`Biểu lũy tiến · TN tính thuế ${f(c.tinhthu)}`,-c.tax,false,'Bảng tính thuế TNCN',taxRows),
+    irow('ti-receipt-tax','var(--color-background-danger)','var(--color-text-danger)','Thuế TNCN',`Biểu lũy tiến · TN tính thuế ${f(c.tinhthu)}`,-c.tax,false,'Bảng tính thuế TNCN',taxRows),
   ];
   document.getElementById(cid).innerHTML=`
   <div class="ig2">
@@ -521,9 +527,9 @@ function rPhieu(d,c,mon,cid){
     <div class="shd">Lịch chuyển khoản</div>
     ${[['CK lần 1','10/01',d.ck1],['CK lần 2','20/01',d.ck2],['CK lần 3 (cuối)','28/01',d.ck3]].map(row=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:.5px solid var(--color-border-tertiary);font-size:12px"><span style="color:var(--color-text-secondary)">${row[0]} (${row[1]})</span><span>${row[2]>0?f(row[2]):'—'}</span><span>${row[2]>0?(row[0].includes('3')?'<span class="bdg ba">Chờ duyệt</span>':'<span class="bdg bg">Đã nhận</span>'):'<span class="bdg bgr">Không có</span>'}</span></div>`).join('')}
   </div>
-  <div class="pr-frame">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:500">Phiếu lương ${mon}</div>
+  <div class="pr-frame" id="paySlipPrint">
+    <div class="noprint" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:500">Phiếu lương · kỳ ${PERIOD}</div>
       <button onclick="window.print()" style="height:32px;padding:0 14px;font-size:12px;background:var(--color-background-info);color:var(--color-text-info);border:.5px solid var(--color-border-info);border-radius:var(--border-radius-md);cursor:pointer"><span style="margin-right:5px;display:inline-flex;vertical-align:middle">${ico('download',12)}</span>Xuất PDF</button>
     </div>
     <div class="pr-hdr"><div class="pr-co">Công ty Cổ phần Bất Động Sản AHS</div><div class="pr-addr">Tầng 04, The Legend Tower, 109 Nguyễn Tuân, Thanh Xuân, Hà Nội · MST: 0109488427</div><div class="pr-title">Phiếu lương tháng ${mon}</div><div class="pr-info">${d.name} · ${d.role} · Khối ${d.khoi} · ${d.hd} · ${d.bank} ${d.stk}</div></div>
@@ -711,7 +717,7 @@ function rAnalytics(d,c,mon,cid){
   const kpiLegend=tiersPos.length?tiersPos.map((t,i)=>`<span><span style="width:14px;height:0;border-top:2px dashed ${['#378ADD','#0C447C','#85B7EB'][i%3]};display:inline-block;vertical-align:middle;margin-right:3px"></span>KPI ${t.m} (${fM(t.need)})</span>`).join(''):'';
   document.getElementById(cid).innerHTML=`
   <div class="chart2">
-    <div>
+    <div class="card">
       <div class="shd">Thu nhập 7 tháng (triệu đ) — bar chồng</div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px;font-size:10px">
         <span style="display:flex;align-items:center;gap:3px"><span style="width:9px;height:9px;border-radius:2px;background:#888780;display:inline-block"></span>Lương CB</span>
@@ -720,7 +726,7 @@ function rAnalytics(d,c,mon,cid){
       </div>
       <div style="position:relative;height:200px"><canvas id="c1" role="img" aria-label="Thu nhập chồng 7 tháng">Thu nhập.</canvas></div>
     </div>
-    <div>
+    <div class="card">
       ${d.kpiDs?`
       <div class="shd">Doanh số theo dự án vs KPI</div>
       <div class="chart-leg" style="margin-bottom:6px;font-size:10px">
@@ -755,6 +761,7 @@ function rAnalytics(d,c,mon,cid){
 }
 
 document.getElementById('nv').addEventListener('keydown',e=>{if(e.key==='Enter')window.go();});
+['dStart','dEnd'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',()=>{if(document.getElementById('content').style.display!=='none')window.go();});});
 document.addEventListener('click',function(e){
   const dd=document.getElementById('dadd');
   if(dd&&dd.classList.contains('open')){const btn=dd.previousElementSibling;if(!dd.contains(e.target)&&btn&&!btn.contains(e.target))dd.classList.remove('open');}
