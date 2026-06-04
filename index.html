@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AHS Property — Hệ thống lương & hoa hồng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+:root{
+ --font-sans:'Be Vietnam Pro',system-ui,-apple-system,sans-serif;
+ --bg:#f3f6fa;--panel:#ffffff;--ink:#1b2330;--ink2:#5a6677;--ink3:#98a2b1;
+ --brand:#185FA5;--brand-d:#0C447C;--border:#e7eaef;
+}
+@media(prefers-color-scheme:dark){:root{
+ --bg:#0d1218;--panel:#11161d;--ink:#e7ecf2;--ink2:#9aa6b4;--ink3:#6b7686;
+ --brand:#5BA0E6;--brand-d:#185FA5;--border:#2a323d;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--ink);display:flex;flex-direction:column;height:100vh}
+.topbar{background:var(--panel);border-bottom:.5px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mono{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;letter-spacing:.5px;flex-shrink:0}
+.co{flex:1 1 auto;min-width:200px}
+.co-name{font-size:15px;font-weight:600;line-height:1.25}
+.co-meta{font-size:11.5px;color:var(--ink2);margin-top:2px;line-height:1.4}
+.co-meta b{color:var(--ink);font-weight:500}
+.nav{display:flex;gap:4px;background:var(--bg);border:.5px solid var(--border);border-radius:10px;padding:3px;flex-shrink:0}
+.nav button{border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;color:var(--ink2);padding:8px 16px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.nav button.on{background:var(--panel);color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.nav button:hover:not(.on){color:var(--ink)}
+.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+.stage{flex:1 1 auto;position:relative}
+iframe{position:absolute;inset:0;width:100%;height:100%;border:none;background:var(--bg)}
+@media(max-width:640px){.topbar{padding:10px 14px;gap:10px}.mono{width:40px;height:40px;font-size:15px}.co-name{font-size:13.5px}.nav{width:100%;order:3}.nav button{flex:1 1 0;justify-content:center;padding:8px 8px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="mono">AHS</div>
+  <div class="co">
+    <div class="co-name">CÔNG TY CỔ PHẦN BẤT ĐỘNG SẢN AHS</div>
+    <div class="co-meta">Tầng 04, The Legend Tower, 109 Nguyễn Tuân, Thanh Xuân, Hà Nội · MST: <b>0109488427</b></div>
+  </div>
+  <div class="nav">
+    <button id="tabPay" class="on" onclick="nav('payslip.html',this)">
+      <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+      Phiếu lương nhân viên
+    </button>
+    <button id="tabOv" onclick="nav('overview.html',this)">
+      <svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><rect x="7" y="11" width="3" height="5"/><rect x="12" y="8" width="3" height="8"/><rect x="17" y="13" width="3" height="3"/></svg>
+      Tổng quan quỹ lương
+    </button>
+  </div>
+</div>
+<div class="stage">
+  <iframe id="frame" src="payslip.html" title="Nội dung trang"></iframe>
+</div>
+<script>
+function nav(src,btn){
+  document.getElementById('frame').src=src;
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+</script>
+</body>
+</html>
