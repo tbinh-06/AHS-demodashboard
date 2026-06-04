@@ -31,13 +31,13 @@ input,select{border:.5px solid var(--color-border-tertiary);border-radius:var(--
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 .app{font-size:13px;line-height:1.5}
-.sb{display:flex;gap:8px;align-items:center;padding:10px 14px;background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:12px}
-.sb input{flex:1 1 auto;min-width:0;height:36px;font-size:14px;padding:0 12px}
+.sb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:12px}
+.sb input{flex:1 1 240px;min-width:0;height:36px;font-size:14px;padding:0 12px}
 .sb select{flex:0 0 100px;width:100px;height:36px;font-size:13px;padding:0 8px}
 .sb button{flex:0 0 auto;height:36px;padding:0 16px;font-size:13px;white-space:nowrap}
-.sb-dates{display:flex;align-items:center;gap:5px;flex:0 0 auto;background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:0 9px;height:36px}
+.sb-dates{display:flex;align-items:center;gap:5px;flex:1 1 260px;min-width:0;background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:0 9px;height:36px}
 .sb-dates label{font-size:10px;color:var(--color-text-secondary);font-weight:500;text-transform:uppercase;letter-spacing:.03em}
-.sb-dates input[type=date]{border:none;height:34px;font-size:12px;background:transparent;color:var(--color-text-primary);width:116px;padding:0 2px}
+.sb-dates input[type=date]{border:none;height:34px;font-size:12px;background:transparent;color:var(--color-text-primary);flex:1 1 0;width:auto;min-width:0;padding:0 2px}
 @media print{@page{margin:12mm}html,body{background:#fff!important}.wrap{max-width:none!important;padding:0!important}body *{visibility:hidden!important}#paySlipPrint,#paySlipPrint *{visibility:visible!important}#paySlipPrint{position:absolute;left:0;top:0;width:100%;margin:0!important;border:none!important;box-shadow:none!important;padding:0!important}.noprint{display:none!important}}
 .nf{padding:14px;text-align:center;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md)}
 .ph{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(16,40,80,.06),0 1px 2px rgba(16,40,80,.04)}
@@ -452,11 +452,12 @@ function rPH(d,c,id,mon){
 
 function rKP(d,c,mon){
   const useKpi=d.kpiDs>0;
-  const daysLeft=d.chuanT-d.ngayCong;
-  const projDS=useKpi&&d.ngayCong>0?Math.round(d.dsTeam/d.ngayCong*d.chuanT):0;
-  const projNet=Math.round(c.net+(d.ngayCong>0?c.net/d.ngayCong*daysLeft:0));
+  const frac=d.chuanT>0?Math.min(1,Math.max(.3,d.ngayCong/d.chuanT)):0.9;
+  const daysLeft=d.chuanT>0?Math.max(0,d.chuanT-d.ngayCong):0;
+  const projDS=useKpi?Math.round(d.dsTeam/frac):0;
+  const projNet=Math.round(c.net/frac);
   const datPct=useKpi?Math.round(d.dsTeam/d.kpiDs*100):0;
-  const rrPct=useKpi&&projDS?Math.round(projDS/d.kpiDs*100):0;
+  const rrPct=useKpi?Math.round(projDS/d.kpiDs*100):0;
   const totalCt=d.hhDa.reduce((s,x)=>s+x.hhTong,0);
   const recvAll=d.hhDa.reduce((s,x)=>s+x.dots.filter(dd=>dd.done).reduce((a,dd)=>a+dd.hh,0),0);
   const pipeline=totalCt-recvAll-c.hhN;
@@ -570,16 +571,16 @@ function renderHHSection(){
   const show=isAll?d.hhDa:d.hhDa.filter(x=>selDA.has(x.da));
   const totHH=show.reduce((s,x)=>{const t=x.dots.find(dd=>dd.cur);return s+(t?t.hh:0);},0);
   const lbl=isAll?'Tất cả dự án ('+d.hhDa.length+')':selDA.size+' dự án được chọn';
-  let sDS=0,sHHt=0,sDa=0,sCl=0;
+  let sDS=0,sHHt=0,sDa=0,sCl=0,sCur=0;
   const rows=show.map((x,idx)=>{
     const cur=x.dots.find(dd=>dd.cur);
     const dH=x.dots.filter(dd=>dd.done).reduce((s,dd)=>s+dd.hh,0);
     const dP=x.dots.filter(dd=>dd.done).reduce((s,dd)=>s+dd.p,0);
     const tP=cur?cur.p:0;
     const cl=x.hhTong-dH-(cur?cur.hh:0);
-    sDS+=x.ds;sHHt+=x.hhTong;sDa+=dH;sCl+=cl;
+    sDS+=x.ds;sHHt+=x.hhTong;sDa+=dH;sCl+=cl;sCur+=(cur?cur.hh:0);
     const done=x.dots.filter(dd=>dd.done);
-    const detRows=done.map(dd=>`<div class="dd-row"><span class="l">${dd.n} · ${dd.paid||dd.d}</span><span class="v">${f(dd.hh)}</span></div>`).join('')+(cur?`<div class="dd-row"><span class="l">${cur.n} · đang về kỳ này</span><span class="v pos">${f(cur.hh)}</span></div>`:'')||'<div class="dd-row"><span class="l">Chưa có đợt nào về</span><span class="v">—</span></div>';
+    const detRows='<div class="dd-title">Chi tiết các đợt — '+x.da+' · DS '+fM(x.ds)+' · HH '+(x.hhR*100).toFixed(1)+'% = '+f(x.hhTong)+'</div>'+'<div style="overflow-x:auto"><table class="tbl" style="min-width:660px;background:var(--color-background-primary)"><thead><tr>'+'<th style="width:27%">Đợt</th><th style="width:12%">Ngày</th><th style="width:10%">Tiến độ</th><th style="width:15%">Doanh số</th><th style="width:11%">% so tổng</th><th style="width:12%">HH nhận</th><th style="width:13%">Trạng thái</th></tr></thead><tbody>'+x.dots.map(function(dd){var dsP=x.ds*dd.p/100;var pT=x.hhTong?dd.hh/x.hhTong*100:0;var st=dd.done?'<span class="bdg bg">Đã nhận</span>':(dd.cur?'<span class="bdg ba">Đang về kỳ này</span>':'<span class="bdg bgr">Dự kiến kỳ sau</span>');return '<tr><td style="font-weight:500">'+dd.n+'</td><td>'+(dd.paid||dd.d)+'</td><td>'+dd.p+'%</td><td>'+fM(dsP)+'</td><td>'+pT.toFixed(0)+'%</td><td class="'+(dd.cur?'pos':'')+'" style="font-weight:500">'+f(dd.hh)+'</td><td>'+st+'</td></tr>';}).join('')+'<tr style="background:var(--color-background-secondary);font-weight:500"><td>Tổng ('+x.dots.length+' đợt)</td><td>—</td><td>100%</td><td>'+fM(x.ds)+'</td><td>100%</td><td class="pos">'+f(x.hhTong)+'</td><td>—</td></tr>'+'</tbody></table></div>';
     return `
     <tr>
       <td style="font-weight:500">${x.da}<div style="font-size:10px;color:var(--color-text-secondary)">${x.can}</div></td>
@@ -590,7 +591,7 @@ function renderHHSection(){
       <td>${mini3(dP,tP)}<div style="font-size:10px;color:var(--color-text-secondary)">${dP+tP}%</div></td>
     </tr>
     <tr class="hh-det" id="hhdet${idx}"><td colspan="6" style="background:var(--color-background-secondary);padding:9px 12px">
-      <div class="dd-title">Lịch sử nhận HH — ${x.da}</div>${detRows}
+      ${detRows}
     </td></tr>`;
   }).join('');
   el.innerHTML=`
@@ -613,7 +614,7 @@ function renderHHSection(){
       <table class="tbl" style="min-width:620px">
         <thead><tr><th style="width:24%">Dự án</th><th style="width:15%">Doanh số</th><th style="width:17%">HH (%DS · tiền)</th><th style="width:18%">Đã nhận</th><th style="width:14%">Còn lại</th><th style="width:14%">% tiến độ</th></tr></thead>
         <tbody>${rows}
-          <tr style="background:var(--color-background-secondary);font-weight:500"><td>Tổng cộng (${show.length} DA)</td><td>${fM(sDS)}</td><td>${f(sHHt)}</td><td class="pos">${f(sDa)}</td><td>${f(sCl)}</td><td>—</td></tr>
+          <tr style="background:var(--color-background-secondary);font-weight:500"><td>Tổng cộng (${show.length} DA)</td><td>${fM(sDS)}</td><td>${f(sHHt)}</td><td class="pos">${f(sDa)}</td><td>${f(sCl)}</td><td>${sHHt?mini3(Math.round(sDa/sHHt*100),Math.round(sCur/sHHt*100)):''}<div style="font-size:10px;color:var(--color-text-secondary)">${sHHt?Math.round((sDa+sCur)/sHHt*100):0}%</div></td></tr>
         </tbody>
       </table>
     </div>
