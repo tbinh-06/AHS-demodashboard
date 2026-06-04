@@ -444,13 +444,6 @@ window.exportXLSX=function(){
   a.push(['TỔNG KHẤU TRỪ',-(c.bh+c.tax)]);
   a.push([]);
   a.push(['THỰC NHẬN',c.net]);
-  a.push([]);
-  a.push(['CƠ SỞ TÍNH THUẾ']);
-  a.push(['Tổng lương',c.gross]);
-  a.push(['(-) BHXH',c.bh]);
-  a.push(['(-) Giảm trừ gia cảnh',c.gtgcA]);
-  a.push(['(=) Thu nhập tính thuế',c.tinhthu]);
-  a.push(['Thuế TNCN',c.tax]);
   const ws=XLSX.utils.aoa_to_sheet(a);
   ws['!cols']=[{wch:36},{wch:16},{wch:3},{wch:10},{wch:20}];
   const wb=XLSX.utils.book_new();
@@ -557,7 +550,7 @@ function rPhieu(d,c,mon,cid){
   const taxRows=[{l:'Tổng thu nhập (tổng lương)',v:f(c.gross)},{l:'− BHXH (10,5%)',v:f(c.bh)},{l:`− Giảm trừ gia cảnh${d.pt?` (bản thân + ${d.pt} NPT)`:' (bản thân)'}`,v:f(c.gtgcA)},{l:'Thu nhập tính thuế',v:f(c.tinhthu)},{l:'Thuế TNCN (biểu lũy tiến)',v:f(c.tax),total:true,sign:'neg'}];
   const ded=[
     irow('ti-shield-check','var(--color-background-secondary)','var(--color-text-secondary)','BHXH + BHYT + BHTN (10.5%)',`Lương đóng BH ${f(d.bhxhBase)} × 10.5%`,-c.bh,false,'Chi tiết BHXH 10,5%',[{l:'BHXH 8%',v:f(Math.round(d.bhxhBase*.08))},{l:'BHYT 1,5%',v:f(Math.round(d.bhxhBase*.015))},{l:'BHTN 1%',v:f(Math.round(d.bhxhBase*.01))},{l:'Tổng khấu trừ BH',v:f(c.bh),total:true,sign:'neg'}]),
-    irow('ti-receipt-tax','var(--color-background-danger)','var(--color-text-danger)','Thuế TNCN',`Biểu lũy tiến · TN tính thuế ${f(c.tinhthu)}`,-c.tax,false,'Bảng tính thuế TNCN',taxRows),
+    irow('ti-receipt-tax','var(--color-background-danger)','var(--color-text-danger)','Thuế TNCN','Khấu trừ theo quy định',-c.tax,false,'',null),
   ];
   document.getElementById(cid).innerHTML=`
   <div class="ig2">
@@ -593,8 +586,6 @@ function rPhieu(d,c,mon,cid){
       <div>
         <div class="pr-row"><span class="pr-lbl">Lương đóng BHXH</span><span>${f(d.bhxhBase)}</span></div>
         <div class="pr-row"><span class="pr-lbl">BHXH 10.5%</span><span class="neg">−${f(c.bh)}</span></div>
-        <div class="pr-row"><span class="pr-lbl">GTGC BT+${d.pt}PT</span><span>${f(c.gtgcA)}</span></div>
-        <div class="pr-row"><span class="pr-lbl">TN tính thuế</span><span>${f(c.tinhthu)}</span></div>
         <div class="pr-row"><span class="pr-lbl">Thuế TNCN</span><span class="neg">−${f(c.tax)}</span></div>
         <div class="pr-row" style="font-weight:500"><span class="pr-lbl" style="font-weight:500">Tổng khấu trừ</span><span class="neg">−${f(c.bh+c.tax)}</span></div>
       </div>
