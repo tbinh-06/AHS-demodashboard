@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
  --font-sans:'Be Vietnam Pro',system-ui,-apple-system,sans-serif;
@@ -412,6 +413,50 @@ window.toggleHH=function(idx,el){const b=document.getElementById('hhdet'+idx);if
 window.toggleDA=function(ddId){const el=document.getElementById(ddId);if(el)el.classList.toggle('open');};
 window.daCheck=function(cb){if(cb.checked)selDA.add(cb.value);else selDA.delete(cb.value);renderHHSection();};
 window.daAll=function(){selDA.clear();renderHHSection();};
+window.exportXLSX=function(){
+  if(!CUR){return;}
+  if(typeof XLSX==='undefined'){alert('Chưa tải được thư viện Excel, thử lại sau giây lát.');return;}
+  const d=CUR.d,c=calc(d),mon=CUR.mon;
+  const a=[];
+  a.push(['CÔNG TY CỔ PHẦN BẤT ĐỘNG SẢN AHS']);
+  a.push(['PHIẾU LƯƠNG '+mon+(PERIOD?'  ·  Kỳ '+PERIOD:'')]);
+  a.push([]);
+  a.push(['Nhân viên',d.name,'','Mã NV',CUR.id]);
+  a.push(['Chức vụ',d.role,'','Khối',d.khoi]);
+  a.push(['Ngân hàng',d.bank,'','Số TK',d.stk]);
+  a.push([]);
+  a.push(['THU NHẬP','Số tiền (đ)']);
+  if(c.lb>0)a.push(['Lương cứng ('+d.ngayCong+'/'+d.chuanT+' công)',c.lb]);
+  if(c.hhN>0)a.push(['Hoa hồng dự án (kỳ này)',c.hhN]);
+  if(c.kq>0)a.push(['Thưởng KQKD Ban TGĐ',c.kq]);
+  if(d.thuongDA>0)a.push(['Thưởng dự án',d.thuongDA]);
+  if(d.thuongTet>0)a.push(['Thưởng Tết 2026',d.thuongTet]);
+  if(d.luongT13>0)a.push(['Lương tháng 13',d.luongT13]);
+  if(d.xe>0)a.push(['Hỗ trợ xăng xe',d.xe]);
+  if(d.an>0)a.push(['Phụ cấp ăn trưa',d.an]);
+  if(d.khac>0)a.push(['Phụ cấp khác',d.khac]);
+  if(d.phat>0)a.push(['Khấu trừ vi phạm',-d.phat]);
+  a.push(['TỔNG THU NHẬP (GROSS)',c.gross]);
+  a.push([]);
+  a.push(['KHẤU TRỪ','Số tiền (đ)']);
+  a.push(['BHXH + BHYT + BHTN (10,5%)',-c.bh]);
+  a.push(['Thuế TNCN (biểu lũy tiến)',-c.tax]);
+  a.push(['TỔNG KHẤU TRỪ',-(c.bh+c.tax)]);
+  a.push([]);
+  a.push(['THỰC NHẬN',c.net]);
+  a.push([]);
+  a.push(['CƠ SỞ TÍNH THUẾ']);
+  a.push(['Tổng lương',c.gross]);
+  a.push(['(-) BHXH',c.bh]);
+  a.push(['(-) Giảm trừ gia cảnh',c.gtgcA]);
+  a.push(['(=) Thu nhập tính thuế',c.tinhthu]);
+  a.push(['Thuế TNCN',c.tax]);
+  const ws=XLSX.utils.aoa_to_sheet(a);
+  ws['!cols']=[{wch:36},{wch:16},{wch:3},{wch:10},{wch:20}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Phieu luong');
+  XLSX.writeFile(wb,'PhieuLuong_'+CUR.id+'_'+mon.replace('/','-')+'.xlsx');
+};
 
 function rPH(d,c,id,mon){
   const rc=d.role==='CTV'?'tg2':'ti2';
@@ -531,9 +576,9 @@ function rPhieu(d,c,mon,cid){
   <div class="pr-frame" id="paySlipPrint">
     <div class="noprint" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div style="font-size:13px;font-weight:500">Phiếu lương · kỳ ${PERIOD}</div>
-      <button onclick="window.print()" style="height:32px;padding:0 14px;font-size:12px;background:var(--color-background-info);color:var(--color-text-info);border:.5px solid var(--color-border-info);border-radius:var(--border-radius-md);cursor:pointer"><span style="margin-right:5px;display:inline-flex;vertical-align:middle">${ico('download',12)}</span>Xuất PDF</button>
+      <button onclick="window.exportXLSX()" style="height:32px;padding:0 14px;font-size:12px;background:var(--color-background-info);color:var(--color-text-info);border:.5px solid var(--color-border-info);border-radius:var(--border-radius-md);cursor:pointer"><span style="margin-right:5px;display:inline-flex;vertical-align:middle">${ico('download',12)}</span>Xuất Excel</button>
     </div>
-    <div class="pr-hdr"><div class="pr-co">Công ty Cổ phần Bất Động Sản AHS</div><div class="pr-addr">Tầng 04, The Legend Tower, 109 Nguyễn Tuân, Thanh Xuân, Hà Nội · MST: 0109488427</div><div class="pr-title">Phiếu lương tháng ${mon}</div><div class="pr-info">${d.name} · ${d.role} · Khối ${d.khoi} · ${d.hd} · ${d.bank} ${d.stk}</div></div>
+    <div class="pr-hdr"><div class="pr-co">Công ty Cổ phần Bất Động Sản AHS</div><div class="pr-title">Phiếu lương tháng ${mon}</div><div class="pr-info">${d.name} · ${d.role} · Khối ${d.khoi} · ${d.hd} · ${d.bank} ${d.stk}</div></div>
     <div class="pr-g">
       <div class="pr-col">
         ${c.lb>0?`<div class="pr-row"><span class="pr-lbl">Lương cứng (${d.ngayCong}/${d.chuanT})</span><span>${f(c.lb)}</span></div>`:''}
@@ -587,10 +632,11 @@ function renderHHSection(){
       <td>${f(x.ds)}</td>
       <td><div style="font-weight:500">${(x.hhR*100).toFixed(1)}%</div><div style="font-size:10px;color:var(--color-text-secondary)">${f(x.hhTong)}</div></td>
       <td><div style="display:flex;align-items:center;gap:4px"><span class="pos" style="font-weight:500">${f(dH)}</span><span class="chev" onclick="toggleHH(${idx},this)" role="button" tabindex="0" aria-label="Lịch sử nhận">${CV}</span></div></td>
+      <td style="color:#378ADD;font-weight:500">${cur?f(cur.hh):'—'}</td>
       <td>${f(cl)}</td>
       <td>${mini3(dP,tP)}<div style="font-size:10px;color:var(--color-text-secondary)">${dP+tP}%</div></td>
     </tr>
-    <tr class="hh-det" id="hhdet${idx}"><td colspan="6" style="background:var(--color-background-secondary);padding:9px 12px">
+    <tr class="hh-det" id="hhdet${idx}"><td colspan="7" style="background:var(--color-background-secondary);padding:9px 12px">
       ${detRows}
     </td></tr>`;
   }).join('');
@@ -611,10 +657,10 @@ function renderHHSection(){
     </div>
     <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:10px">HH kỳ này (${show.length} DA): <strong style="color:var(--color-text-info)">${f(totHH)}</strong></div>
     <div style="overflow-x:auto;border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)">
-      <table class="tbl" style="min-width:620px">
-        <thead><tr><th style="width:24%">Dự án</th><th style="width:15%">Doanh số</th><th style="width:17%">HH (%DS · tiền)</th><th style="width:18%">Đã nhận</th><th style="width:14%">Còn lại</th><th style="width:14%">% tiến độ</th></tr></thead>
+      <table class="tbl" style="min-width:720px">
+        <thead><tr><th style="width:22%">Dự án</th><th style="width:13%">Doanh số</th><th style="width:15%">HH (%DS · tiền)</th><th style="width:14%">Đã nhận</th><th style="width:13%">Kỳ này</th><th style="width:12%">Còn lại</th><th style="width:11%">% tiến độ</th></tr></thead>
         <tbody>${rows}
-          <tr style="background:var(--color-background-secondary);font-weight:500"><td>Tổng cộng (${show.length} DA)</td><td>${fM(sDS)}</td><td>${f(sHHt)}</td><td class="pos">${f(sDa)}</td><td>${f(sCl)}</td><td>${sHHt?mini3(Math.round(sDa/sHHt*100),Math.round(sCur/sHHt*100)):''}<div style="font-size:10px;color:var(--color-text-secondary)">${sHHt?Math.round((sDa+sCur)/sHHt*100):0}%</div></td></tr>
+          <tr style="background:var(--color-background-secondary);font-weight:500"><td>Tổng cộng (${show.length} DA)</td><td>${fM(sDS)}</td><td>${f(sHHt)}</td><td class="pos">${f(sDa)}</td><td style="color:#378ADD;font-weight:500">${f(sCur)}</td><td>${f(sCl)}</td><td>${sHHt?mini3(Math.round(sDa/sHHt*100),Math.round(sCur/sHHt*100)):''}<div style="font-size:10px;color:var(--color-text-secondary)">${sHHt?Math.round((sDa+sCur)/sHHt*100):0}%</div></td></tr>
         </tbody>
       </table>
     </div>
@@ -639,11 +685,6 @@ function rTeam(d,c,mon,cid){
     const isOn=t.m===d.hhMuc;const reach=t.need?Math.min(100,Math.round(d.dsTeam/t.need*100)):100;const hh=Math.round(d.dsTeam*t.r/100);
     return`<div class="tier-c ${isOn?'active':''}"><div class="tier-m">${t.m} ${isOn?'<span class="bdg ba">Đang áp</span>':''}</div><div class="tier-r ${isOn?'pos':''}">${t.r}%</div><div class="tier-hhval ${isOn?'pos':''}">${f(hh)}</div><div class="tier-note">${t.need?'Cần DS ≥ '+fM(t.need):'Mức cơ bản'}</div>${!isOn&&t.need>d.dsTeam?`<div style="font-size:11px;color:var(--color-text-danger);margin-top:3px;font-weight:500">+${f(hh-curHH)} nếu đạt · cần thêm ${fM(t.need-d.dsTeam)}</div>`:isOn&&next?`<div style="font-size:11px;color:var(--color-text-info);margin-top:3px">Lên ${next.m}: +${f(diffHH)}</div>`:''}${t.need?`<div class="pg" style="margin-top:5px"><div class="pf" style="width:${reach}%;background:${reach>=100?'#185FA5':reach>=60?'#378ADD':'#85B7EB'}"></div></div>`:''}</div>`;
   }).join('')}</div>`;
-  const tierTable=`
-  <div style="overflow:hidden;border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
-    <table class="tbl"><thead><tr><th style="width:16%">Mức</th><th style="width:14%">Tỷ lệ</th><th>DS cần đạt</th><th>Cần thêm</th><th style="width:18%">Trạng thái</th></tr></thead>
-    <tbody>${d.hhTiers.map(t=>{const isOn=t.m===d.hhMuc;const nd=t.need>d.dsTeam?fM(t.need-d.dsTeam):'Đã đạt';return`<tr style="${isOn?'background:var(--color-background-info)':''}"><td><span class="bdg ${isOn?'ba':'bgr'}">${t.m}</span></td><td style="font-weight:${isOn?500:400};color:${isOn?'var(--color-text-info)':'inherit'}">${t.r}%</td><td style="color:var(--color-text-secondary)">${t.need?fM(t.need):'—'}</td><td style="color:${nd==='Đã đạt'?'var(--color-text-info)':'var(--color-text-danger)'}">${nd}</td><td>${isOn?'<span class="bdg ba">Đang áp</span>':'<span class="bdg bgr">Chưa</span>'}</td></tr>`;}).join('')}</tbody></table>
-  </div>`;
   const rows=tm.map((m,i)=>{
     const pt=totalDS?Math.round(m.ds/totalDS*100):0;
     const avgHH=m.projects.length?(m.projects.reduce((s,p)=>s+(p.ds?p.hh/p.ds:0),0)/m.projects.length*100):0;
@@ -682,7 +723,7 @@ function rTeam(d,c,mon,cid){
     </table>
   </div>`;
   document.getElementById(cid).innerHTML=`
-  <div class="card"><div class="shd">Cơ chế HH ${d.role} — 3 mức · DS team ${fM(d.dsTeam)} · KPI ${fM(d.kpiDs)}</div>${tierCards}${tierTable}</div>
+  <div class="card"><div class="shd">Cơ chế HH ${d.role} — 3 mức · DS team ${fM(d.dsTeam)} · KPI ${fM(d.kpiDs)}</div>${tierCards}</div>
   <div class="team-stat">
     <div class="kc"><div class="kl">DS team / KPI</div><div class="kv">${fM(d.dsTeam)}</div><div class="pg"><div class="pf" style="width:${Math.min(100,Math.round(d.dsTeam/d.kpiDs*100))}%;background:${Math.round(d.dsTeam/d.kpiDs*100)>=100?'#185FA5':'#378ADD'}"></div></div></div>
     <div class="kc"><div class="kl">HH ${d.hhMuc} hiện tại</div><div class="kv pos">${f(curHH)}</div><div class="ks">${cur?cur.r+'%':'—'} × ${fM(d.dsTeam)}</div></div>
