@@ -94,6 +94,11 @@ input,select{border:.5px solid var(--color-border-tertiary);border-radius:var(--
 .heat-legend{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:10px;color:var(--color-text-secondary);flex-wrap:wrap}
 .heat-legend i{display:block;width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(24,95,165,.05),rgba(24,95,165,.47))}
 </style>
+<style>
+/* ==== responsive: phone (portrait + landscape) ==== */
+@media(max-width:760px){.row2{flex-wrap:wrap;overflow-x:visible}.row2>.card{flex:1 1 100%;min-width:0}}
+@media(max-width:560px){.wrap{padding:12px 11px 30px}.flt{flex-direction:column;align-items:stretch}.flt-g{width:100%}.flt-g input[type=date]{width:auto;flex:1 1 0}.ov-ttl{font-size:15px}.kpi-v{font-size:16px}.kpis{gap:7px}}
+</style>
 </head>
 <body>
 <div class="wrap">
