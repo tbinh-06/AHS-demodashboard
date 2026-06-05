@@ -242,6 +242,8 @@ const pct=(a,b)=>b?Math.round(a/b*100)+'%':'—';
 function spark(arr,color){const max=Math.max.apply(null,arr.concat([1]));const w=70,h=24,n=arr.length;const bw=w/n-2;return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="vertical-align:middle">`+arr.map((v,i)=>{const bh=Math.max(1,v/max*h);return `<rect x="${(i*(w/n)).toFixed(1)}" y="${(h-bh).toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="1" fill="${i===n-1?color:'#B5D4F4'}"/>`;}).join('')+`</svg>`;}
 function mini3(dP,tP){const rP=Math.max(0,100-dP-tP);return `<div class="mini3"><div style="width:${dP}%;background:#185FA5"></div><div style="width:${tP}%;background:#378ADD"></div><div style="width:${rP}%;background:transparent"></div></div>`;}
 function canCode(base,i){if(i===0)return base||'—';const m=(''+base).match(/^(.*?)(\d+)$/);if(m){return m[1]+String(parseInt(m[2],10)+i).padStart(m[2].length,'0');}return base+'-'+(i+1);}
+const PJPRE={'Masteri Era Landmark':'MEL','Vinhomes Smart City':'VSC','Vinhomes Ocean Park 3':'VOP','Hà Đô Charm Villas':'HDC','An Lạc Riverside':'ALR','Sunshine City Sài Gòn':'SSC'};
+function projCan(da,seed){const p=PJPRE[da]||(''+da).replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase()||'AHS';return p+'-'+String(20+(seed*7)%40).padStart(2,'0')+'-'+String(1+(seed*3)%18).padStart(2,'0');}
 let charts={};
 function kc(){Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={};}
 function tax(t){if(t<=0)return 0;const b=[[5e6,.05],[5e6,.1],[8e6,.15],[14e6,.2],[20e6,.25],[28e6,.3],[Infinity,.35]];let x=0,r=t;for(const[l,rt]of b){if(r<=0)break;const tx=Math.min(r,l);x+=tx*rt;r-=tx;}return Math.round(x);}
@@ -253,7 +255,7 @@ function calc(d){
   const bh=Math.round(d.bhxhBase*.105);
   const gtgcA=d.gtgc?(11000000+d.pt*4400000):0;
   const tinhthu=Math.max(0,gross-bh-gtgcA);
-  const t=tax(tinhthu);
+  const t=d.role==='CTV'?Math.round(hhN*.1):tax(tinhthu);
   return{lb,hhN,kq,gross,bh,gtgcA,chuthu:Math.max(0,gross-(d.an||0)),tinhthu,tax:t,net:gross-(bh+t)};
 }
 function diffStr(now,prev){if(!prev)return'';const d=Math.round(now-prev),p=Math.round((now-prev)/prev*100);return`<span class="${d>=0?'up':'dn'}">${d>=0?'+':''}${fM(d)} (${p>=0?'+':''}${p}%)</span>`}
@@ -335,7 +337,7 @@ cmpNet:8200000,
 trend:[{m:'T07',net:5,lb:4.5,hh:0,th:0.5,ds:0},{m:'T08',net:6.5,lb:4.5,hh:1,th:1,ds:52},{m:'T09',net:7,lb:4.5,hh:1.5,th:1,ds:60},{m:'T10',net:8.2,lb:4.5,hh:2.5,th:1.2,ds:75},{m:'T11',net:7.8,lb:4.5,hh:2,th:1.3,ds:68},{m:'T12',net:8.2,lb:4.5,hh:3,th:0.7,ds:52},{m:'T01',net:0,lb:0,hh:0,th:0,ds:73.8}],
 daDist:[{da:'Masteri Era',pct:62,ds:73.8},{da:'Hà Đô',pct:38,ds:55}]
 },
-'CTV001':{name:'Nguyễn Thu Hà',init:'NH',role:'CTV',khoi:'A3',phong:'PKD A3',hd:'CTV',mst:'N/A',bank:'TECHCOMBANK',stk:'19032044298686',ngayBD:'01/06/2025',bhxhBase:0,gtgc:1,pt:0,bhxhSt:'Không đóng',tncn:'Lũy tiến (đang khai)',luong:0,ngayCong:0,chuanT:0,phepHuong:0,phepNamNay:0,phepCon:0,phepConT02:0,ngayLe:0,ngayKL:0,kpiDs:50000000,dsTeam:35000000,dsCK:28000000,hhMuc:'—',hhTiers:[],teamMembers:null,
+'CTV001':{name:'Nguyễn Thu Hà',init:'NH',role:'CTV',khoi:'A3',phong:'PKD A3',hd:'CTV',mst:'N/A',bank:'TECHCOMBANK',stk:'19032044298686',ngayBD:'01/06/2025',bhxhBase:0,gtgc:0,pt:0,bhxhSt:'Không đóng',tncn:'10% tại nguồn',luong:0,ngayCong:0,chuanT:0,phepHuong:0,phepNamNay:0,phepCon:0,phepConT02:0,ngayLe:0,ngayKL:0,kpiDs:50000000,dsTeam:35000000,dsCK:28000000,hhMuc:'—',hhTiers:[],teamMembers:null,
 hhDa:[
   {da:'Masteri Era Landmark',can:'C3Z2-24-02',ds:35000000,hhR:0.10,hhTong:3500000,ngayGhiNhan:'28/01/2026',dots:[{n:'Đợt 1 — TT 100%',p:100,d:'28/01/2026',hh:3500000,cur:true}]},
   {da:'Sunshine City Sài Gòn',can:'SS-T2-0318',ds:48000000,hhR:0.08,hhTong:3840000,ngayGhiNhan:'22/12/2025',dots:[{n:'Đợt 1 — Ký HĐ (50%)',p:50,d:'22/12/2025',hh:1920000,done:true,paid:'22/12/2025'},{n:'Đợt 2 — Bàn giao (50%)',p:50,d:'01/08/2026',hh:1920000}]},
@@ -538,7 +540,7 @@ function rPhieu(d,c,mon,cid){
   const hhCur=d.hhDa.filter(x=>x.dots.find(dd=>dd.cur));
   const inc=[
     d.luong>0?irow('ti-id-badge','var(--color-background-info)','var(--color-text-info)','Lương cứng theo ngày công',`${f(d.luong)} × ${d.ngayCong}/${d.chuanT} = ${Math.round(d.ngayCong/d.chuanT*100)}%`,c.lb,true,'Cách tính lương cứng',[{l:'Lương cứng tháng',v:f(d.luong)},{l:'Ngày công',v:`${d.ngayCong}/${d.chuanT} (${pct(d.ngayCong,d.chuanT)})`},{l:'Lương thực tính',v:f(c.lb),total:true,sign:'pos'}]):null,
-    c.hhN>0?irow('ti-building-store','var(--color-background-info)','var(--color-text-info)','Hoa hồng dự án (kỳ này)',`${hhCur.length} DA đến hạn · Xem chi tiết ở tab Phân tích`,c.hhN,true,'Hoa hồng kỳ này theo dự án',hhCur.map(x=>{const t=x.dots.find(dd=>dd.cur);return{l:`${x.da} · đợt ${t.p}%`,v:f(t.hh)};}).concat([{l:'Tổng HH kỳ này',v:f(c.hhN),total:true,sign:'pos'}])):null,
+    c.hhN>0?irow('ti-building-store','var(--color-background-info)','var(--color-text-info)','Hoa hồng dự án (kỳ này)',`${hhCur.length} DA đến hạn · Xem chi tiết ở tab Phân tích`,c.hhN,true,'Hoa hồng kỳ này theo dự án',hhCur.map(x=>{const ci=x.dots.findIndex(dd=>dd.cur);const t=x.dots[ci];return{l:`${x.da} · ${canCode(x.can,ci)}`,v:f(t.hh)};}).concat([{l:'Tổng HH kỳ này',v:f(c.hhN),total:true,sign:'pos'}])):null,
     c.kq>0?irow('ti-star','var(--color-background-info)','var(--color-text-info)','Thưởng KQKD Ban TGĐ','0,01% × DT tháng × 13 khối',c.kq,true,'Thưởng kết quả kinh doanh',[{l:'Doanh thu công ty tháng',v:f(156789211)},{l:'Hệ số',v:'0,01% × 13 khối'},{l:'Thưởng KQKD',v:f(c.kq),total:true,sign:'pos'}]):null,
     d.thuongDA>0?irow('ti-trophy','var(--color-background-info)','var(--color-text-info)','Thưởng dự án','Chính sách DA riêng',d.thuongDA,true,'Thưởng dự án',[{l:'Mức thưởng',v:f(d.thuongDA)},{l:'Thuế TNCN',v:'Có tính'}]):null,
     d.thuongTet>0?irow('ti-gift','var(--color-background-info)','var(--color-text-info)','Thưởng tết Nguyên Đán 2026','Chi một lần kèm lương tháng này',d.thuongTet,true,'Thưởng Tết 2026',[{l:'Mức thưởng',v:f(d.thuongTet)},{l:'Miễn thuế',v:'Không'}]):null,
@@ -617,7 +619,11 @@ function renderHHSection(){
     const cl=x.hhTong-dH-(cur?cur.hh:0);
     sDS+=x.ds;sHHt+=x.hhTong;sDa+=dH;sCl+=cl;sCur+=(cur?cur.hh:0);
     const done=x.dots.filter(dd=>dd.done);
-    const detRows='<div class="dd-title">Chi tiết theo căn — '+x.da+' · '+x.dots.length+' căn · DS '+fM(x.ds)+' · HH '+(x.hhR*100).toFixed(1)+'% = '+f(x.hhTong)+'</div>'+'<div style="overflow-x:auto"><table class="tbl" style="min-width:680px;background:var(--color-background-primary)"><thead><tr>'+'<th style="width:22%">Mã căn</th><th style="width:14%">Ngày ký</th><th style="width:17%">Doanh số</th><th style="width:11%">%HH</th><th style="width:17%">Hoa hồng</th><th style="width:19%">Trạng thái</th></tr></thead><tbody>'+x.dots.map(function(dd,i){var dsC=x.hhR?Math.round(dd.hh/x.hhR):0;var pT=x.hhTong?dd.hh/x.hhTong*100:0;var st=dd.done?'<span class="bdg bg">Đã nhận</span>':(dd.cur?'<span class="bdg ba">Đang về kỳ này</span>':'<span class="bdg bgr">Dự kiến kỳ sau</span>');return '<tr><td style="font-weight:500">'+canCode(x.can,i)+'</td><td>'+(dd.paid||dd.d)+'</td><td>'+fM(dsC)+'</td><td>'+pT.toFixed(0)+'%</td><td class="'+(dd.cur?'pos':'')+'" style="font-weight:500">'+f(dd.hh)+'</td><td>'+st+'</td></tr>';}).join('')+'<tr style="background:var(--color-background-secondary);font-weight:500"><td>Tổng ('+x.dots.length+' căn)</td><td>—</td><td>'+fM(x.ds)+'</td><td>100%</td><td class="pos">'+f(x.hhTong)+'</td><td>—</td></tr>'+'</tbody></table></div>';
+    const _b=x.dots.map(function(dd,i){return (dd.hh/(x.hhR||0.02))*(0.8+((i*53)%41)/100);});
+    const _sb=_b.reduce(function(a,v){return a+v;},0)||1;
+    const _ds=_b.map(function(v){return Math.round(v/_sb*x.ds);});
+    const _dsT=_ds.reduce(function(a,v){return a+v;},0);
+    const detRows='<div class="dd-title">Chi tiết theo căn — '+x.da+' · '+x.dots.length+' căn · DS '+fM(x.ds)+' · Tổng HH '+f(x.hhTong)+'</div>'+'<div style="overflow-x:auto"><table class="tbl" style="min-width:690px;background:var(--color-background-primary)"><thead><tr>'+'<th style="width:21%">Mã căn</th><th style="width:14%">Ngày ký</th><th style="width:18%">Doanh số</th><th style="width:14%">%HH (trên DS)</th><th style="width:16%">Hoa hồng</th><th style="width:17%">Trạng thái</th></tr></thead><tbody>'+x.dots.map(function(dd,i){var dsC=_ds[i];var rate=dsC?dd.hh/dsC*100:0;var st=dd.done?'<span class="bdg bg">Đã nhận</span>':(dd.cur?'<span class="bdg ba">Đang về kỳ này</span>':'<span class="bdg bgr">Dự kiến kỳ sau</span>');return '<tr><td style="font-weight:500">'+canCode(x.can,i)+'</td><td>'+(dd.paid||dd.d)+'</td><td>'+fM(dsC)+'</td><td style="font-weight:500">'+rate.toFixed(2)+'%</td><td class="'+(dd.cur?'pos':'')+'" style="font-weight:500">'+f(dd.hh)+'</td><td>'+st+'</td></tr>';}).join('')+'<tr style="background:var(--color-background-secondary);font-weight:500"><td>Tổng ('+x.dots.length+' căn)</td><td>—</td><td>'+fM(_dsT)+'</td><td>'+(_dsT?(x.hhTong/_dsT*100).toFixed(2):'0')+'%</td><td class="pos">'+f(x.hhTong)+'</td><td>—</td></tr>'+'</tbody></table></div>';
     return `
     <tr>
       <td style="font-weight:500">${x.da}<div style="font-size:10px;color:var(--color-text-secondary)">${x.dots.length} căn</div></td>
@@ -682,7 +688,7 @@ function rTeam(d,c,mon,cid){
     const avgHH=m.projects.length?(m.projects.reduce((s,p)=>s+(p.ds?p.hh/p.ds:0),0)/m.projects.length*100):0;
     const kpiPct=m.kpi?Math.round(m.ds/m.kpi*100):0;
     const kpiC=kpiPct>=100?'#185FA5':kpiPct>=50?'#378ADD':'#85B7EB';
-    const projRows=m.projects.map(p=>`<tr><td style="font-weight:500">${p.da}</td><td>${f(p.ds)}</td><td style="font-size:11px;color:var(--color-text-secondary)">${(p.hh/p.ds*100).toFixed(1)}%</td><td class="pos" style="font-weight:500">${f(p.hh)}</td></tr>`).join('');
+    const projRows=m.projects.map((p,pi)=>`<tr><td style="font-weight:500">${p.da}</td><td style="font-size:11px;color:var(--color-text-secondary)">${projCan(p.da,i*10+pi)}</td><td>${f(p.ds)}</td><td style="font-size:11px;color:var(--color-text-secondary)">${(p.hh/p.ds*100).toFixed(1)}%</td><td class="pos" style="font-weight:500">${f(p.hh)}</td></tr>`).join('');
     return`
     <tr class="tm-row" onclick="toggleTeam(${i}, this.querySelector('.tmchev'))">
       <td style="font-weight:500">${m.name}</td>
@@ -703,7 +709,7 @@ function rTeam(d,c,mon,cid){
       </div>
       <div style="font-size:11px;color:var(--color-text-secondary);font-weight:500;margin-bottom:5px">Các dự án đóng góp doanh thu</div>
       <div style="overflow:hidden;border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary)">
-        <table class="tbl" style="margin:0"><thead><tr><th>Dự án</th><th style="width:28%">Doanh số</th><th style="width:14%">%HH</th><th style="width:26%">HH</th></tr></thead><tbody>${projRows}</tbody></table>
+        <table class="tbl" style="margin:0"><thead><tr><th>Dự án</th><th style="width:20%">Mã căn</th><th style="width:22%">Doanh số</th><th style="width:12%">%HH</th><th style="width:22%">HH</th></tr></thead><tbody>${projRows}</tbody></table>
       </div>
     </td></tr>`;
   }).join('');
