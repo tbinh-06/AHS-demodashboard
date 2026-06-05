@@ -158,6 +158,7 @@ const gC=isDark?'rgba(255,255,255,.07)':'rgba(0,0,0,.05)';
 const fM=n=>(Math.round(n/100000)/10).toFixed(1)+'M';
 const fB=n=>(n/1e9).toFixed(2)+' tỷ';
 const fMoney=n=>Math.abs(n)>=1e9?fB(n):fM(n);
+function projCan(da,seed){const PRE={'Masteri Era Landmark':'MEL','An Lạc Riverside':'ALR','Hà Đô Charm Villas':'HDC','Sunshine City Sài Gòn':'SSC','Vinhomes Ocean Park 3':'VOP','Vinhomes Smart City':'VSC'};const p=PRE[da]||(''+da).replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase()||'AHS';return p+'-'+String(20+(seed*7)%40).padStart(2,'0')+'-'+String(1+(seed*3)%18).padStart(2,'0');}
 const P=(a,b)=>b?(a/b*100).toFixed(0)+'%':'—';
 const CV='<span class="chev"><svg class="cv" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>';
 function mm(a){let mn=Infinity,mx=-Infinity;a.forEach(v=>{if(v<mn)mn=v;if(v>mx)mx=v;});return{mn,mx};}
@@ -266,7 +267,7 @@ function render(){
  const totNV=proj.reduce((a,p)=>a+p.emps.length,0);
  document.getElementById('tProj').innerHTML=
   '<thead><tr><th>Dự án</th><th>DS ghi nhận</th><th>HH kỳ này</th><th>Số NV</th><th>% HH</th></tr></thead><tbody>'+
-  proj.map((p,i)=>'<tr class="exp-row" onclick="toggleRow(\''+'pj'+i+'\',this)"><td>'+p.da+CV+'</td><td>'+fMoney(p.ds)+'</td><td class="pos" style="font-weight:500">'+fM(p.hh)+'</td><td>'+p.emps.length+'</td><td>'+(projHH?(p.hh/projHH*100).toFixed(0):0)+'%</td></tr><tr class="det" id="pj'+i+'"><td colspan="5"><div class="det-wrap"><table class="itbl"><thead><tr><th>Nhân viên</th><th>Vai trò</th><th>HH nhận từ dự án</th><th>%HH</th></tr></thead><tbody>'+p.emps.map(x=>'<tr><td>'+x[0]+'</td><td><span class="bdg '+(x[1]==='CTV'?'g':'')+'">'+x[1]+'</span></td><td class="pos" style="font-weight:500">'+fM(x[2])+'</td><td>'+(p.hh?(x[2]/p.hh*100).toFixed(0):0)+'%</td></tr>').join('')+'</tbody></table></div></td></tr>').join('')+
+  proj.map((p,i)=>'<tr class="exp-row" onclick="toggleRow(\''+'pj'+i+'\',this)"><td>'+p.da+CV+'</td><td>'+fMoney(p.ds)+'</td><td class="pos" style="font-weight:500">'+fM(p.hh)+'</td><td>'+p.emps.length+'</td><td>'+(projHH?(p.hh/projHH*100).toFixed(0):0)+'%</td></tr><tr class="det" id="pj'+i+'"><td colspan="5"><div class="det-wrap"><table class="itbl"><thead><tr><th>Nhân viên</th><th>Mã căn</th><th>Vai trò</th><th>HH nhận từ dự án</th><th>%HH</th></tr></thead><tbody>'+p.emps.map((x,ei)=>'<tr><td>'+x[0]+'</td><td style="color:var(--color-text-secondary)">'+projCan(p.da,i*10+ei)+'</td><td><span class="bdg '+(x[1]==='CTV'?'g':'')+'">'+x[1]+'</span></td><td class="pos" style="font-weight:500">'+fM(x[2])+'</td><td>'+(p.hh?(x[2]/p.hh*100).toFixed(0):0)+'%</td></tr>').join('')+'</tbody></table></div></td></tr>').join('')+
   '<tr class="tot"><td>Tổng ('+proj.length+' DA)</td><td>'+fMoney(totDS)+'</td><td class="pos">'+fM(projHH)+'</td><td>'+totNV+'</td><td>100%</td></tr></tbody>';
  document.getElementById('projNote').textContent=khoi==='ALL'?'Hoa hồng dự án theo kỳ đã chọn. Cột %HH = phần hoa hồng của nhân viên trên tổng HH của dự án đó.':'Lương dự án là số liệu toàn công ty, không tách theo khối.';
 
